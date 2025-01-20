@@ -1,0 +1,14 @@
+*
+!*.*
+!*/
+
+main
+processor
+
+*.txt
+*.out
+*.exe
+*.o
+
+.vscode/
+.tmp
