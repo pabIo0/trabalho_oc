@@ -12,6 +12,6 @@ struct Instrucao {
 };
 
 void processarInstrucoes();
-void adicionarInstrucao(int idx, const std::string &comando);
+void adicionarInstrucao(int idx, const string &comando);
 
 #endif
