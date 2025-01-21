@@ -1,63 +1,84 @@
+#include "conversor.h"
 #include <iostream>
-#include <fstream>
-#include <string>
 #include <cstring>
+#include <sstream>
 
-#define MAX_INSTRUCOES 100
-#define MAX_COMANDO 50
-
-// Estrutura para armazenar as instruções e os sinais de controle
-struct Instrucao {
-    char comando[MAX_COMANDO];
-    int regDst, aluSrc, memToReg, regWrite, memRead, memWrite, branch, aluOp;
-};
+using namespace std;
 
 Instrucao memoriaInstrucoes[MAX_INSTRUCOES];
-int pc = 0; // Contador de programa (PC)
+int pc = 0;
 
 void processarInstrucoes() {
     for (int i = 0; i < MAX_INSTRUCOES; i++) {
-        // Verifica se há instrução
         if (strlen(memoriaInstrucoes[i].comando) == 0) continue;
 
-        std::cout << "Instrucao: " << memoriaInstrucoes[i].comando << std::endl;
+        string comando = memoriaInstrucoes[i].comando;
+        string operando;
         
-        // Exibindo os sinais de controle
-        std::cout << "Sinais de Controle:" << std::endl;
-        std::cout << "RegDst: " << memoriaInstrucoes[i].regDst
-                  << ", ALUSrc: " << memoriaInstrucoes[i].aluSrc
-                  << ", MemtoReg: " << memoriaInstrucoes[i].memToReg
-                  << ", RegWrite: " << memoriaInstrucoes[i].regWrite
-                  << ", MemRead: " << memoriaInstrucoes[i].memRead
-                  << ", MemWrite: " << memoriaInstrucoes[i].memWrite
-                  << ", Branch: " << memoriaInstrucoes[i].branch
-                  << ", ALUOp: " << memoriaInstrucoes[i].aluOp
-                  << std::endl;
+        if (comando.find("addi") != string::npos) {
+            stringstream ss(comando);
+            string instrucao, registradorDestino, registradorOrigem, valorImediato;
+            ss >> instrucao >> registradorDestino >> registradorOrigem >> valorImediato;
+            cout << instrucao << " " << registradorDestino << " = " << valorImediato << ": PC = PC + 4;" << endl;
 
-        std::cout << "PC = " << pc << std::endl << std::endl;
-        pc += 4; // Atualiza o contador de programa
+        } else if (comando.find("add") != string::npos) {
+            stringstream ss(comando);
+            string instrucao, registradorDestino, registrador1, registrador2;
+            ss >> instrucao >> registradorDestino >> registrador1 >> registrador2;
+            cout << instrucao << " " << registradorDestino << " = " << registrador1 << " + " << registrador2 << ": PC = PC + 4;" << endl;
 
-        // Exemplo: Caso haja algum tipo de operação especial, como alteração na memória ou nos registradores
-        if (strstr(memoriaInstrucoes[i].comando, "sw") != nullptr) {
-            std::cout << "Alteracao na memoria." << std::endl;
+        } else if (comando.find("sub") != string::npos) {
+            stringstream ss(comando);
+            string instrucao, registradorDestino, registrador1, registrador2;
+            ss >> instrucao >> registradorDestino >> registrador1 >> registrador2;
+            cout << instrucao << " " << registradorDestino << " = " << registrador1 << " - " << registrador2 << ": PC = PC + 4;" << endl;
+
+        } else if (comando.find("beq") != string::npos) {
+            stringstream ss(comando);
+            string instrucao, registrador1, registrador2, label;
+            ss >> instrucao >> registrador1 >> registrador2 >> label;
+            cout << instrucao << " " << registrador1 << " == " << registrador2 << " : PC = PC + 4 (se verdadeiro);" << endl;
+
+        } else if (comando.find("lw") != string::npos) {
+            stringstream ss(comando);
+            string instrucao, registradorDestino, deslocamento, registradorBase;
+            ss >> instrucao >> registradorDestino >> deslocamento >> registradorBase;
+            cout << instrucao << " " << registradorDestino << " = Mem[" << registradorBase << " + " << deslocamento << "] : PC = PC + 4;" << endl;
+
+        } else if (comando.find("sw") != string::npos) {
+            stringstream ss(comando);
+            string instrucao, registradorDestino, deslocamento, registradorBase;
+            ss >> instrucao >> registradorDestino >> deslocamento >> registradorBase;
+            cout << instrucao << " Mem[" << registradorBase << " + " << deslocamento << "] = " << registradorDestino << ": PC = PC + 4;" << endl;
+
+        } else if (comando.find("j") != string::npos) {
+            stringstream ss(comando);
+            string instrucao, label;
+            ss >> instrucao >> label;
+            cout << instrucao << " " << label << ": PC = " << label << ";" << endl;
         }
 
-        if (strstr(memoriaInstrucoes[i].comando, "lw") != nullptr) {
-            std::cout << "Leitura da memoria." << std::endl;
-        }
-        
-        // Verificar se é um salto (beq, j, etc.)
-        if (strstr(memoriaInstrucoes[i].comando, "beq") != nullptr) {
-            std::cout << "Salto condicional." << std::endl;
-        }
+        cout << "ALUOp: " << (memoriaInstrucoes[i].aluOp == -1 ? "X" : to_string(memoriaInstrucoes[i].aluOp))
+            << ", RegDst: " << (memoriaInstrucoes[i].regDst == -1 ? "X" : to_string(memoriaInstrucoes[i].regDst))
+            << ", ALUSrc: " << (memoriaInstrucoes[i].aluSrc == -1 ? "X" : to_string(memoriaInstrucoes[i].aluSrc))
+            << ", MemtoReg: " << (memoriaInstrucoes[i].memToReg == -1 ? "X" : to_string(memoriaInstrucoes[i].memToReg))
+            << ", Reg-Write: " << (memoriaInstrucoes[i].regWrite == -1 ? "X" : to_string(memoriaInstrucoes[i].regWrite))
+            << ", Mem-Read: " << (memoriaInstrucoes[i].memRead == -1 ? "X" : to_string(memoriaInstrucoes[i].memRead))
+            << ", Mem-Write: " << (memoriaInstrucoes[i].memWrite == -1 ? "X" : to_string(memoriaInstrucoes[i].memWrite))
+            << ", Branch: " << (memoriaInstrucoes[i].branch == -1 ? "X" : to_string(memoriaInstrucoes[i].branch))
+            << endl;
+
+
+        cout << "PC = " << pc << endl << endl;
+
+        pc += 4; 
     }
 }
 
-void adicionarInstrucao(int idx, const std::string &comando) {
+void adicionarInstrucao(int idx, const string &comando) {
     strcpy(memoriaInstrucoes[idx].comando, comando.c_str());
     
-    // Exemplos fictícios de sinais de controle (precisam ser ajustados conforme a lógica MIPS)
-    if (comando.find("addi") != std::string::npos) {
+    if (comando.find("addi") != string::npos) {
         memoriaInstrucoes[idx].regDst = 0;
         memoriaInstrucoes[idx].aluSrc = 1;
         memoriaInstrucoes[idx].memToReg = 0;
@@ -66,7 +87,7 @@ void adicionarInstrucao(int idx, const std::string &comando) {
         memoriaInstrucoes[idx].memWrite = 0;
         memoriaInstrucoes[idx].branch = 0;
         memoriaInstrucoes[idx].aluOp = 10;
-    } else if (comando.find("add") != std::string::npos) {
+    } else if (comando.find("add") != string::npos) {
         memoriaInstrucoes[idx].regDst = 1;
         memoriaInstrucoes[idx].aluSrc = 0;
         memoriaInstrucoes[idx].memToReg = 0;
@@ -75,16 +96,25 @@ void adicionarInstrucao(int idx, const std::string &comando) {
         memoriaInstrucoes[idx].memWrite = 0;
         memoriaInstrucoes[idx].branch = 0;
         memoriaInstrucoes[idx].aluOp = 10;
-    } else if (comando.find("sw") != std::string::npos) {
-        memoriaInstrucoes[idx].regDst = 0;
-        memoriaInstrucoes[idx].aluSrc = 1;
+    } else if (comando.find("sub") != string::npos) {
+        memoriaInstrucoes[idx].regDst = 1;
+        memoriaInstrucoes[idx].aluSrc = 0;
         memoriaInstrucoes[idx].memToReg = 0;
+        memoriaInstrucoes[idx].regWrite = 1;
+        memoriaInstrucoes[idx].memRead = 0;
+        memoriaInstrucoes[idx].memWrite = 0;
+        memoriaInstrucoes[idx].branch = 0;
+        memoriaInstrucoes[idx].aluOp = 10;
+    } else if (comando.find("beq") != string::npos) {
+        memoriaInstrucoes[idx].regDst = -1;
+        memoriaInstrucoes[idx].aluSrc = 0;
+        memoriaInstrucoes[idx].memToReg = -1;
         memoriaInstrucoes[idx].regWrite = 0;
         memoriaInstrucoes[idx].memRead = 0;
-        memoriaInstrucoes[idx].memWrite = 1;
-        memoriaInstrucoes[idx].branch = 0;
-        memoriaInstrucoes[idx].aluOp = 00;
-    } else if (comando.find("lw") != std::string::npos) {
+        memoriaInstrucoes[idx].memWrite = 0;
+        memoriaInstrucoes[idx].branch = 1;
+        memoriaInstrucoes[idx].aluOp = 01;
+    } else if (comando.find("lw") != string::npos) {
         memoriaInstrucoes[idx].regDst = 0;
         memoriaInstrucoes[idx].aluSrc = 1;
         memoriaInstrucoes[idx].memToReg = 1;
@@ -93,34 +123,23 @@ void adicionarInstrucao(int idx, const std::string &comando) {
         memoriaInstrucoes[idx].memWrite = 0;
         memoriaInstrucoes[idx].branch = 0;
         memoriaInstrucoes[idx].aluOp = 00;
+    } else if (comando.find("sw") != string::npos) {
+        memoriaInstrucoes[idx].regDst = -1;
+        memoriaInstrucoes[idx].aluSrc = 1;
+        memoriaInstrucoes[idx].memToReg = -1;
+        memoriaInstrucoes[idx].regWrite = 0;
+        memoriaInstrucoes[idx].memRead = 0;
+        memoriaInstrucoes[idx].memWrite = 1;
+        memoriaInstrucoes[idx].branch = 0;
+        memoriaInstrucoes[idx].aluOp = 00;
+    } else if (comando.find("j") != string::npos) {
+        memoriaInstrucoes[idx].regDst = -1;
+        memoriaInstrucoes[idx].aluSrc = -1;
+        memoriaInstrucoes[idx].memToReg = -1;
+        memoriaInstrucoes[idx].regWrite = 0;
+        memoriaInstrucoes[idx].memRead = 0;
+        memoriaInstrucoes[idx].memWrite = 0;
+        memoriaInstrucoes[idx].branch = 0;
+        memoriaInstrucoes[idx].aluOp = -1;
     }
-}
-
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        std::cout << "Uso: " << argv[0] << " <arquivo de entrada>" << std::endl;
-        return 1;
-    }
-
-    std::ifstream file(argv[1]);
-    if (!file.is_open()) {
-        std::cout << "Erro ao abrir o arquivo " << argv[1] << std::endl;
-        return 1;
-    }
-
-    std::string linha;
-    int idx = 0;
-    while (std::getline(file, linha) && idx < MAX_INSTRUCOES) {
-        // Remover espaços extras
-        linha.erase(linha.find_last_not_of(" \n\r\t") + 1);
-        if (linha.length() > 0) {
-            adicionarInstrucao(idx, linha);
-            idx++;
-        }
-    }
-
-    file.close();
-
-    processarInstrucoes();
-    return 0;
 }
