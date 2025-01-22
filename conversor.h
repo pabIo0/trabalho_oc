@@ -9,9 +9,15 @@
 struct Instrucao {
     char comando[MAX_COMANDO];
     int regDst, aluSrc, memToReg, regWrite, memRead, memWrite, branch, aluOp;
+    int registradorDestino, registradorOrigem, valorImediato, pcAlterado; 
 };
 
+int registradores[32] = {0};
+
 void processarInstrucoes();
+void operacaoRegistradores(const std::string &instrucao, const std::string &registradorDestino, const std::string &registradorOrigem, const std::string &valorImediato, const std::string &label);
 void adicionarInstrucao(int idx, const std::string &comando);
+void converteInstrucaoParaBinario(int idx, const std::string &comando);
+void exibirRelatorio(int idx);
 
 #endif
