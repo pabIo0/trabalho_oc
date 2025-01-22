@@ -5,23 +5,20 @@
 #define MAX_INSTRUCOES 100
 #define MAX_COMANDO 50
 
-// Estrutura para armazenar as instruções e os sinais de controle
 typedef struct {
     char comando[MAX_COMANDO];
     int regDst, aluSrc, memToReg, regWrite, memRead, memWrite, branch, aluOp;
 } Instrucao;
 
 Instrucao memoriaInstrucoes[MAX_INSTRUCOES];
-int pc = 0; // Contador de programa (PC)
+int pc = 0;
 
 void processarInstrucoes() {
     for (int i = 0; i < MAX_INSTRUCOES; i++) {
-        // Verifica se há instrução
         if (strlen(memoriaInstrucoes[i].comando) == 0) continue;
 
         printf("Instrucao: %s\n", memoriaInstrucoes[i].comando);
         
-        // Exibindo os sinais de controle
         printf("Sinais de Controle:\n");
         printf("RegDst: %d, ALUSrc: %d, MemtoReg: %d, RegWrite: %d, MemRead: %d, MemWrite: %d, Branch: %d, ALUOp: %d\n", 
             memoriaInstrucoes[i].regDst, memoriaInstrucoes[i].aluSrc, memoriaInstrucoes[i].memToReg, 
@@ -46,7 +43,6 @@ void processarInstrucoes() {
 void adicionarInstrucao(int idx, const char *comando) {
     strcpy(memoriaInstrucoes[idx].comando, comando);
     
-    // Exemplos fictícios de sinais de controle (precisam ser ajustados conforme a lógica MIPS)
     if (strstr(comando, "addi") != NULL) {
         memoriaInstrucoes[idx].regDst = 1;
         memoriaInstrucoes[idx].aluSrc = 1;
@@ -86,7 +82,8 @@ void adicionarInstrucao(int idx, const char *comando) {
     }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) 
+{
     if (argc != 2) {
         printf("Uso: %s <arquivo de entrada>\n", argv[0]);
         return 1;
