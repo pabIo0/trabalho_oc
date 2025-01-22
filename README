@@ -1,0 +1,6 @@
+falta principalmente: fazer com que as funções leiam as entradas de forma diferente
+exemplo: lw espera RegistradorDestino, Deslocamento(RegistradorOrigem)
+         addi espera RegistradorDestino, RegistradorOrigem, ValorImediato
+         add espera RegistradorDestino, RegistradorOrigem, RegistradorOrigem1
+
+falta eliminar algumas coisas inúteis do programa (que fazem a mesma coisa em duas funções diferentes)
