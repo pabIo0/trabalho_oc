@@ -9,6 +9,7 @@ using namespace std;
 Instrucao memoriaInstrucoes[MAX_INSTRUCOES];
 int pc = 0;
 int memoria[1024] = {0};
+int registradores[32] = {0};
 
 void converteInstrucaoParaBinario(int idx, const string &comando) {
     stringstream ss(comando);
@@ -32,6 +33,7 @@ void converteInstrucaoParaBinario(int idx, const string &comando) {
     }
 }
 
+// Tratar de sinais don't care
 string dontCare(int valor) {
     return valor == -1 ? "X" : to_string(valor);
 }
@@ -39,6 +41,7 @@ string dontCare(int valor) {
 void exibirRelatorio(int idx) {
     cout << "Sinais de controle: " << endl;
 
+    // Para o aluOp ter 2 bits de saída
     string aluOpStr = memoriaInstrucoes[idx].aluOp == -1 ? "X" : bitset<2>(memoriaInstrucoes[idx].aluOp).to_string();
 
     cout << "ALUOp: " << aluOpStr << ", ";
@@ -60,17 +63,21 @@ void processarInstrucoes() {
         string comando = memoriaInstrucoes[i].comando;
         string instrucao, registradorDestino, registradorOrigem, valorImediato, label;
 
+        // Extraindo partes da instrução
         stringstream ss(comando);
         ss >> instrucao >> registradorDestino >> registradorOrigem >> valorImediato >> label;
 
+        // Executa a operação no registrador
         operacaoRegistradores(instrucao, registradorDestino, registradorOrigem, valorImediato, label);
 
+        // Converte e exibe os sinais de controle
         converteInstrucaoParaBinario(i, comando);
         exibirRelatorio(i);
 
         pc += 4;
     }
 }
+
 
 void operacaoRegistradores(const string &instrucao, const string &registradorDestino, const string &registradorOrigem, const string &valorImediato, const string &label) {
     int destino = registradorDestino[2] - '0';
@@ -92,7 +99,7 @@ void operacaoRegistradores(const string &instrucao, const string &registradorDes
     } else if (instrucao == "sw") {
         try {
             int imediato = std::stoi(valorImediato);
-            imediato /= 4;
+            imediato /= 4;  // Ajusta o valor do deslocamento
         } catch (const std::invalid_argument& e) {
             std::cerr << endl << "Erro ao converter o valor: " << valorImediato;
         }
@@ -122,11 +129,14 @@ void adicionarInstrucao(int idx, const string &comando) {
     stringstream ss(comando);
     string instrucao, registradorDestino, registradorOrigem, valorImediato;
 
+    // Primeiro, lê a instrução
     ss >> instrucao;
     
     if (instrucao == "sw" || instrucao == "lw") {
+        // Se 'sw' ou 'lw', lê desta forma
         ss >> registradorOrigem >> valorImediato >> registradorDestino;
     } else {
+        // Para as demais instruções, seguimos a leitura norma
         ss >> registradorDestino >> registradorOrigem >> valorImediato;
     }
 
@@ -179,7 +189,7 @@ void adicionarInstrucao(int idx, const string &comando) {
 
         stringstream ss(valorImediato);
         int imediato;
-        ss >> imediato;
+        ss >> imediato;  // Extrai o número imediatamente à esquerda
         int endereco = registradores[registradorOrigem[2] - '0'] + imediato / 4;
         cout << endl << "sw " << registradorOrigem << "[" << imediato << "] = " << registradorDestino << "; PC = PC + 4" << endl;
     }
