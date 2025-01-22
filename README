@@ -1,3 +1,6 @@
+compilação: g++ *.cpp -o conversor
+            conversor.exe teste.txt
+
 falta principalmente: fazer com que as funções leiam as entradas de forma diferente
 exemplo: lw espera RegistradorDestino, Deslocamento(RegistradorOrigem)
          addi espera RegistradorDestino, RegistradorOrigem, ValorImediato
