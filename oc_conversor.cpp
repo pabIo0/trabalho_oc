@@ -1,4 +1,4 @@
-#include "novoconversor.h"
+#include "conversor.h"
 #include <iostream>
 #include <cstring>
 #include <bitset>
